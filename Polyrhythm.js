@@ -66,11 +66,11 @@ class Polyrhythm {
     }
 
     dimensions = {
-        horizontalMargin: 20,
-        verticalMargin: 7,
-
-        guideLineWidth: 0
-    }
+        horizontalMargin: 0.14,
+        verticalMargin: 0.07,
+    };
+    
+    guideLineWidth = 0;
 
     debugMode = false;
     mathUtils = new MathUtils();
@@ -108,8 +108,8 @@ class Polyrhythm {
     getMarginDistance = () => {
         const {width, height} = this.canvas;
 
-        const verticalMarginDistance = this.dimensions.verticalMargin / 100 * height;
-        const horizontalMarginDistance = this.dimensions.horizontalMargin / 100 * width;
+        const verticalMarginDistance = this.dimensions.verticalMargin * height;
+        const horizontalMarginDistance = this.dimensions.horizontalMargin * width;
         return {verticalMarginDistance, horizontalMarginDistance};
     }
 
@@ -120,20 +120,8 @@ class Polyrhythm {
         this.context.fillRect(0, 0, width, height);
         
         if(this.debugMode) {
-            const lineY = (i) => 18 + i * 20;
 
-            let i;
-
-            this.context.font = "15px Monospace";
-            this.context.fillStyle = "white";
-            this.context.fillText(`Dimensions: (${width}, ${height}),  `, 3, lineY(0));
-            this.context.fillText(`GuideLine: ${this.dimensions.guideLineWidth},`, 3, lineY(1));
-            this.context.fillText(`SoundEnabled: ${this.soundEnabled},`, 3, lineY(2));
-            this.context.fillText(`LastImpactTime: [`, 3, lineY(3));
-            for(i = 0; i < this.arcLength; i ++) {
-                this.context.fillText(`    ${this.impactTime[i]},`, 3, lineY(i + 4));
-            }
-            this.context.fillText(`]`, 3, lineY(i + 4));
+            this.writeDebug();   
         }
     }    
 
@@ -146,7 +134,7 @@ class Polyrhythm {
             verticalMarginDistance
         } = this.getMarginDistance();
 
-        this.dimensions.guideLineWidth = width - horizontalMarginDistance * 2;
+        this.guideLineWidth = width - horizontalMarginDistance * 2;
 
         this.context.strokeStyle = this.style.mainColor;
         this.context.beginPath();
@@ -176,14 +164,14 @@ class Polyrhythm {
 
         this.context.beginPath();
         this.context.fillStyle = this.style.mainColor;
-        this.context.arc(x, y, this.dimensions.guideLineWidth * this.ballRadius, 0, Math.PI * 2);
+        this.context.arc(x, y, this.guideLineWidth * this.ballRadius, 0, Math.PI * 2);
         this.context.fill();
 
     }
 
     arcsAndCircles = () => {
-        const initialArcRadius = this.dimensions.guideLineWidth * this.initialArcRadius;
-        const spacing = ((this.dimensions.guideLineWidth / 2 - initialArcRadius) / (this.arcLength - 1));
+        const initialArcRadius = this.guideLineWidth * this.initialArcRadius;
+        const spacing = ((this.guideLineWidth / 2 - initialArcRadius) / (this.arcLength - 1));
 
         for(let index = 0; index < this.arcLength; index ++) {
             const radius = initialArcRadius + ((index) * spacing);
@@ -233,4 +221,89 @@ class Polyrhythm {
         });
     }
     run = this.drawFrame;
+
+
+
+    writeDebug = () => {
+
+        const {width, height} = this.canvas;
+
+        const fontSize = 15;
+        const fontFamily = "Monospace";
+        const fontColor = "black";
+        const margin = 15;
+        const lineSpacing = 5;
+
+        const columnLeftX = margin;
+        const columnRightX = width - 200 - margin;
+
+        const backgroundColor = `rgba(255, 255, 255, 0.3)`;
+        
+        let i;
+
+        let actualLineLeft = 0;
+        let actualLineRight = 0;
+
+        const lineY = (i) => fontSize + margin + i * (fontSize + lineSpacing);
+        const nextLine = (column = "left") => {
+            if(column === "left") {
+                actualLineLeft += 1;
+                return lineY(actualLineLeft - 1);
+            } else if(column === "right") {
+                actualLineRight += 1;
+                return lineY(actualLineRight - 1);
+            }
+        }
+
+        this.context.fillStyle = backgroundColor;
+        this.context.fillRect(0, 0, 230, height);
+        this.context.fill();
+
+        this.context.fillStyle = backgroundColor;
+        this.context.fillRect(columnRightX - margin, 0, width, height);
+        this.context.fill();
+
+        const debug = (text, column = "left") => {
+            this.context.fillText(text, column === "left" ? columnLeftX : columnRightX, nextLine(column));
+        }
+
+        this.context.font = `${fontSize}px ${fontFamily}`;
+        this.context.fillStyle = fontColor;
+
+
+        debug(`Dimensions: (${width}, ${height})`);
+        debug(`Guide line: ${this.guideLineWidth}`);
+        debug(`Guide line margin X: ${Math.trunc(this.dimensions.horizontalMargin * 100)}%`);
+        debug(`Guide line margin Y: ${Math.trunc(Math.trunc(this.dimensions.verticalMargin * 100))}%`);
+        debug(`Sound enabled: ${this.soundEnabled}`);
+        debug(`Volume: ${this.volume * 100}%`);
+        debug(``);
+        debug(`Last impact time: `);
+        for(i = 0; i < this.arcLength; i ++) {
+            const impactDate = new Date(this.impactTime[i]);
+            debug(` - ${impactDate.toTimeString().split(" ")[0]}:${impactDate.getMilliseconds()}`);
+        }
+
+        debug(`Center point:`, "right");
+        debug(`  - x: ${this.centerPoint.x}`, "right");
+        debug(`  - y: ${this.centerPoint.y}`, "right");
+        debug(`Number of arcs: ${this.arcLength}`, "right");
+        debug(`Ball radius: ${this.ballRadius * 100}%`, "right");
+        debug(`First arc radius: ${this.initialArcRadius * 100}%`, "right");
+        debug(`Cycle time: ${this.cycleTime}ms`, "right");
+        
+        debug(``, "right");
+        debug(`Runtime: ${this.time}s`, "right"); 
+        debug(`Next impact count down: `, "right");
+        for(i = 0; i < this.arcLength; i ++) {
+            let {nextImpactTime} = this.getArcData(i);
+
+            nextImpactTime = Math.trunc(nextImpactTime);
+            nextImpactTime -= new Date().getTime();
+
+            nextImpactTime /= 1000;
+            debug(`  - ${nextImpactTime}s, `, "right");
+        }
+        
+    }
 }
