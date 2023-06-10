@@ -4,8 +4,8 @@
 }
 
 html, body {
-    overflow: hidden;
-    background-color: salmon;
+    /* overflow: hidden; */
+    background-color: #d08e95;
 }
 
 #background {
