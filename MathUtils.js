@@ -20,4 +20,22 @@ class MathUtils {
         return ajustedDistance;
     }
 
+    calculateNextImpactTime = (currentImpactTime, velocity) => {
+        const distance = Math.PI;
+        return currentImpactTime + this.getTime(distance, velocity) * 1000;
+    }
+
+    calculateCirclePosition = (radius, distance, centerX, centerY) => {
+        const x = radius * Math.cos(distance) + centerX;
+        const y = radius * Math.sin(distance) + centerY;
+        return {x, y};
+    }
+
+    calculateCenterPoint = (width, height, verticalMargin = 0) => {
+        return {
+            x: canvas.width / 2,
+            y: canvas.height - verticalMargin
+        }
+    }
+
 }
