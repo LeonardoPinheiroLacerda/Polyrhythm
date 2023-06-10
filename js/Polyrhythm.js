@@ -7,7 +7,11 @@ class Polyrhythm {
         this.context = canvas.getContext("2d");
 
         document.addEventListener("visibilitychange", (evt => this.soundEnabled = false));
-        canvas.addEventListener("click", (evt) => this.soundEnabled = !this.soundEnabled)
+        canvas.addEventListener("click", (evt) => this.soundEnabled = !this.soundEnabled);
+
+        for(let index = 0; index < this.arcLength; index ++) {
+            this.getAudio(index).preload;
+        }
     }
 
 
@@ -176,11 +180,34 @@ class Polyrhythm {
 
         this.guideLineWidth = width - horizontalMarginDistance * 2;
 
-        this.context.strokeStyle = this.style.mainColor;
-        this.context.beginPath();
-        this.context.moveTo(horizontalMarginDistance, height - verticalMarginDistance);
-        this.context.lineTo(width - horizontalMarginDistance, height - verticalMarginDistance);
-        this.context.stroke();
+        // Circle guide line
+
+        const initialArcRadius = this.guideLineWidth * this.initialArcRadius;
+        const spacing = ((this.guideLineWidth / 2 - initialArcRadius) / (this.arcLength - 1));
+        const y = height - verticalMarginDistance;
+        
+        for(let index = 0; index < this.arcLength; index ++) {
+            const x = horizontalMarginDistance + (spacing * index);
+            const color = this.colors.slice(0).reverse()[index];
+            
+            this.statiCircle(x, y, color);
+        }
+
+        for(let index = this.arcLength; index < this.arcLength * 2; index ++) {
+            let x = horizontalMarginDistance + (spacing * (index - 1));
+            x += this.initialArcRadius * (this.guideLineWidth * 2);
+            const color = this.colors[index - 21]
+            
+            this.statiCircle(x, y, color);
+        }
+
+        // Line guide line
+
+        // this.context.strokeStyle = this.style.mainColor;
+        // this.context.beginPath();
+        // this.context.moveTo(horizontalMarginDistance, height - verticalMarginDistance);
+        // this.context.lineTo(width - horizontalMarginDistance, height - verticalMarginDistance);
+        // this.context.stroke();
 
     }
 
@@ -209,6 +236,13 @@ class Polyrhythm {
 
     }
 
+    statiCircle = (x, y, color) => {
+        this.context.beginPath();
+        this.context.fillStyle = color === undefined ? this.style.mainColor : color;
+        this.context.arc(x, y, this.guideLineWidth * this.ballRadius, 0, Math.PI * 2);
+        this.context.fill();
+    }
+
     arcsAndCircles = () => {
         const initialArcRadius = this.guideLineWidth * this.initialArcRadius;
         const spacing = ((this.guideLineWidth / 2 - initialArcRadius) / (this.arcLength - 1));
@@ -223,11 +257,12 @@ class Polyrhythm {
             this.arc(radius, color);
             this.circle(circleDistance, radius, color);
             
-            if(new Date().getTime() >= nextImpactTime) {
+            //Delay para corrigir tempo
+            if(new Date().getTime() + 150 >= nextImpactTime) {
                 this.impactTime[index] = new Date().getTime();                
 
                 if(this.soundEnabled){
-                    const audio = new Audio(`./assets/key-${index}.mp3`);
+                    const audio = this.getAudio(index);
                     audio.volume = this.volume;
                     audio.play();
                 }
@@ -262,7 +297,9 @@ class Polyrhythm {
     }
     run = this.drawFrame;
 
-
+    getAudio = (index) => {
+        return new Audio(`./assets/key-${index}.mp3`);
+    }
 
     writeDebug = () => {
 
