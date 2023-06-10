@@ -61,11 +61,11 @@ class Polyrhythm {
     ]
 
     style = {
-        backgroundColor: "black",
+        backgroundColor: "rgba(0, 0, 0, 0)",
         mainColor: "#D0E7F5"
     }
 
-    dimensions = {
+    margin = {
         horizontalMargin: 0.14,
         verticalMargin: 0.07,
     };
@@ -102,14 +102,14 @@ class Polyrhythm {
             color: this.colors[index],
             nextImpactTime: this.mathUtils.calculateNextImpactTime(this.impactTime[index], velocity),
             velocity
-        }
+        }   
     }
 
     getMarginDistance = () => {
         const {width, height} = this.canvas;
 
-        const verticalMarginDistance = this.dimensions.verticalMargin * height;
-        const horizontalMarginDistance = this.dimensions.horizontalMargin * width;
+        const verticalMarginDistance = this.margin.verticalMargin * height;
+        const horizontalMarginDistance = this.margin.horizontalMargin * width;
         return {verticalMarginDistance, horizontalMarginDistance};
     }
 
@@ -273,8 +273,8 @@ class Polyrhythm {
 
         debug(`Dimensions: (${width}, ${height})`);
         debug(`Guide line: ${this.guideLineWidth}`);
-        debug(`Guide line margin X: ${Math.trunc(this.dimensions.horizontalMargin * 100)}%`);
-        debug(`Guide line margin Y: ${Math.trunc(Math.trunc(this.dimensions.verticalMargin * 100))}%`);
+        debug(`Guide line margin X: ${Math.trunc(this.margin.horizontalMargin * 100)}%`);
+        debug(`Guide line margin Y: ${Math.trunc(Math.trunc(this.margin.verticalMargin * 100))}%`);
         debug(`Sound enabled: ${this.soundEnabled}`);
         debug(`Volume: ${this.volume * 100}%`);
         debug(``);

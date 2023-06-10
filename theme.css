@@ -5,9 +5,18 @@
 
 html, body {
     overflow: hidden;
+    background-color: salmon;
 }
 
-#canvas {
+#background {
+    opacity: 0.5;
+}
+
+#canvas, #background {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
 }
+
