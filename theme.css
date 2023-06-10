@@ -10,6 +10,7 @@ html, body {
 
 #background {
     opacity: 0.5;
+    object-fit: cover;
 }
 
 #canvas, #background {
