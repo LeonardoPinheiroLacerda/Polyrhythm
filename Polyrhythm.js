@@ -10,29 +10,69 @@ class Polyrhythm {
         canvas.addEventListener("click", (evt) => this.soundEnabled = !this.soundEnabled)
     }
 
+
     colors = [
-        "#D0E7F5",
-        "#D9E7F4",
-        "#D6E3F4",
-        "#BCDFF5",
-        "#B7D9F4",
-        "#C3D4F0",
-        "#9DC1F3",
-        "#9AA9F4",
-        "#8D83EF",
-        "#AE69F0",
-        "#D46FF1",
-        "#DB5AE7",
-        "#D911DA",
-        "#D601CB",
-        "#E713BF",
-        "#F24CAE",
-        "#FB79AB",
-        "#FFB6C1",
-        "#FED2CF",
-        "#FDDFD5",
-        "#FEDCD1"
-    ];
+        "#fbf6f6",
+        "#f9f0f1",
+        "#f6eaec",
+        "#f4e4e6",
+        "#f1dfe1",
+        "#efd9db",
+        "#edd3d6",
+        "#eacdd0",
+        "#e8c8cb",
+        "#e6c2c6",
+        "#e3bcc0",
+        "#e1b6bb",
+        "#deb0b5",
+        "#dcabb0",
+        "#daa5ab",
+        "#d79fa5",
+        "#d599a0",
+        "#d3939a",
+        "#d08e95",
+        "#ce888f",
+        "#cb828a",
+        "#c97c85",
+        "#c7777f",
+        "#c4717a",
+        "#c26b74",
+        "#c0656f",
+        "#bd5f6a",
+        "#bb5a64",
+        "#b8545f",
+        "#b64e59",
+        "#b34955",
+        "#ad4752",
+        "#a7444f",
+        "#a2424c",
+        "#9c404a",
+        "#963d47",
+        "#903b44",
+        "#8a3841",
+        "#85363f",
+        "#7f343c",
+        "#793139",
+        "#732f36",
+        "#6d2d34",
+        "#682a31",
+        "#62282e",
+        "#5c252b",
+        "#562329",
+        "#512126",
+        "#4b1e23",
+        "#451c20",
+        "#3f1a1e",
+        "#39171b",
+        "#341518",
+        "#2e1215",
+        "#281013",
+        "#220e10",
+        "#1c0b0d",
+        "#17090a",
+        "#110708",
+        "#0b0405",
+    ].slice(33, 54);
     
     loopsForCycle = [
         50,
@@ -62,7 +102,7 @@ class Polyrhythm {
 
     style = {
         backgroundColor: "rgba(0, 0, 0, 0)",
-        mainColor: "#D0E7F5"
+        mainColor: this.colors[21]
     }
 
     margin = {
@@ -158,12 +198,12 @@ class Polyrhythm {
         this.context.stroke();
     }
 
-    circle = (distance, radius) => {
+    circle = (distance, radius, color) => {
 
         const {x, y} = this.mathUtils.calculateCirclePosition(radius, distance, this.centerPoint.x, this.centerPoint.y);
 
         this.context.beginPath();
-        this.context.fillStyle = this.style.mainColor;
+        this.context.fillStyle = color === undefined ? this.style.mainColor : color;
         this.context.arc(x, y, this.guideLineWidth * this.ballRadius, 0, Math.PI * 2);
         this.context.fill();
 
@@ -181,7 +221,7 @@ class Polyrhythm {
             const circleDistance = this.mathUtils.calcDistance(velocity, this.time);
 
             this.arc(radius, color);
-            this.circle(circleDistance, radius);
+            this.circle(circleDistance, radius, color);
             
             if(new Date().getTime() >= nextImpactTime) {
                 this.impactTime[index] = new Date().getTime();                
